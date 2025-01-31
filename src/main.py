@@ -21,24 +21,20 @@ api = ApiCrefaz(api_key)
 # conn 
 database.connect()
 df = database.query("SELECT * FROM TB_MIS_CADASTRO_PROPOSTA_CREFAZ")
-# print(df)
+print(df)
 
 # login
 api.login()
-proposta_payload = {
-    "nome": df['NM_NOME'].iloc[0],
-    "cpf": str(df['NU_CPF_CNPJ'].iloc[0]),
-    "nascimento": df['DT_NASCIMENTO'].iloc[0],
-    "telefone": df['TEL'].iloc[0],
-    "ocupacaoId": 1,
-    "cep": "63030000",
-    "cidadeId": 1762,
-    "bairro": "Bairro",
-    "logradouro": "Nome da Rua",
-    "urlNotificacaoParceiro": "https://URL_DE_NOTIFICACAO"
-}
-response = api.cadastrar_proposta(proposta_payload)
-print(response)
-# print(proposta_payload)
 
-df1 = database.update_value(response[2], response[3], response[1])
+for _, row in df.iterrows():
+    proposta_payload = database.create_payload(row)
+    print('payload ok')
+    print(proposta_payload)
+    response = api.cadastrar_proposta(proposta_payload)
+    print('cadastrar proposta ok')
+
+    if response:
+        print(response)
+        id_cliente = row['ID_CLIENTE']
+        database.update_value(response[2], response[3], response[1], id_cliente)
+

@@ -18,6 +18,7 @@ class ApiCrefaz:
             response.raise_for_status()
             response_data = response.json()
             self.token = response_data['data']['token']
+            print('succesfull login, token ok')
         except requests.exceptions.HTTPError as errh:
             print(errh)
         except requests.exceptions.RequestException as err:
@@ -41,5 +42,14 @@ class ApiCrefaz:
             nome = payload['nome']
             cpf = payload['cpf']
             return nome, cpf, response_data['data']['propostaId'], response_data['data']['aprovado']
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 400:
+                return f"ERRO 400 - Possivel cliente já cadastrado - {response.text}"
+            else:
+                return response.status_code
         except requests.exceptions.RequestException as e:
             print(f"Erro na requisição: ApiCrefaz>cadastrar_proposta{e}")
+        
+
+ 
+        
